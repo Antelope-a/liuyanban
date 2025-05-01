@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.content.label(class="form-label") }}
+            {{ form.content(class="form-control", rows=3) }}
+        </div>
+        <div class="mb-3">
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.images.label(class="form-label") }}
+            {{ form.images(class="form-control") }}
+            <small class="text-muted">最多可上传5张图片（支持多选）</small>
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+<!-- 添加搜索按钮 -->
+    <div class="mt-4 mb-4">
+        <a href="{{ url_for('main.search') }}" class="btn btn-primary">
+            <i class="bi bi-search"></i> 进入搜索页
+        </a>
+    </div>
+    <!-- 在留言表单上方添加 -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            最新公告
+        </div>
+        <div class="card-body">
+            {% for ann in announcements %}
+            <div class="mb-3">
+                <h5>{{ ann.title }}</h5>
+                <p class="text-muted small">
+                    {{ ann.timestamp.strftime('%Y-%m-%d') }} 由{{ ann.admin.username }}发布
+                </p>
+                <p>{{ ann.content }}</p>
+            </div>
+            {% else %}
+            <p class="text-muted">暂无公告</p>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- 留言列表 -->
+    <div class="mt-5">
+        <h3>历史留言</h3>
+        {% for msg in messages %}  <!-- 修改循环变量为 msg -->
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5 class="card-title">{{ msg.username }}</h5>
+                    <p class="card-text">{{ msg.content }}</p>
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        {% for image in msg.images %}
+                            <img src="{{ url_for('main.uploaded_file', filename=image.filename) }}" 
+                                 class="img-thumbnail" 
+                                 style="max-width: 200px; max-height: 200px;">
+                        {% endfor %}
+                    </div>
+                    <a href="{{ url_for('main.reply_message', parent_id=msg.id) }}" class="btn btn-sm btn-secondary mt-2">回复</a>
+                    {% if msg.replies %}  <!-- 使用 msg.replies -->
+                        <div class="ms-4 mt-2 border-start ps-3">
+                            {% for reply in msg.replies %}
+                                <div class="card mt-2">
+                                    <div class="card-body">
+                                        <p class="card-text">{{ reply.content }}</p>
+                                        <small class="text-muted">
+                                            {{ reply.username }} 于 {{ reply.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                                        </small>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <small class="text-muted">{{ msg.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-muted">暂无留言~</p>
+        {% endfor %}
+    </div>
+{% endblock %}

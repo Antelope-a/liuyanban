@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+<!-- 在页面顶部添加 -->
+    <div class="mb-4">
+        <a href="{{ url_for('main.index') }}" 
+           class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> 返回
+        </a>
+    </div>
+    <h4>回复给 {{ parent.username }}：</h4>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.content.label(class="form-label") }}
+            {{ form.content(class="form-control", rows=3) }}
+        </div>
+        <div class="mb-3">
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control") }}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+</div>
+{% endblock %}

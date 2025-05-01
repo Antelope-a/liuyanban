@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-4">
+        <a href="{{ url_for('main.admin_dashboard') }}" 
+           class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> 返回管理面板
+        </a>
+    </div>
+    <h2>留言管理</h2>
+
+    <!-- 搜索框 -->
+    <form method="GET" action="{{ url_for('main.manage_messages') }}" class="mb-4">
+        <div class="input-group">
+            <input type="text" 
+                   name="q" 
+                   class="form-control" 
+                   placeholder="输入关键词（内容或用户）"
+                   value="{{ q }}">
+            <button type="submit" class="btn btn-primary">搜索</button>
+        </div>
+    </form>
+
+    <!-- 留言列表 -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>内容</th>
+                <th>用户</th>
+                <th>时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in messages.items %}
+            <tr>
+                <td>{{ message.content }}</td>
+                <td>{{ message.username }}</td>
+                <td>{{ message.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                    <form method="POST" 
+                          action="{{ url_for('main.delete_message', message_id=message.id, q=q) }}">
+                        <button type="submit" 
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('确定删除此留言？')">
+                            删除
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">暂无留言</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- 分页导航 -->
+    <nav>
+        <ul class="pagination">
+            {% for page_num in messages.iter_pages() %}
+            <li class="page-item {% if page_num == messages.page %}active{% endif %}">
+                <a class="page-link" 
+                   href="{{ url_for('main.manage_messages', page=page_num, q=q) }}">
+                    {{ page_num }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

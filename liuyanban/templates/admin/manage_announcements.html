@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-4">
+        <a href="{{ url_for('main.admin_dashboard') }}" 
+           class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> 返回管理面板
+        </a>
+    </div>
+    <h2>公告管理
+        <a href="{{ url_for('main.post_announcement') }}" 
+           class="btn btn-success btn-sm float-end">
+            + 新公告
+        </a>
+    </h2>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>标题</th>
+                <th>发布时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ann in announcements.items %}
+            <tr>
+                <td>{{ ann.title }}</td>
+                <td>{{ ann.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+    <!-- 编辑按钮 -->
+                    <a href="{{ url_for('main.edit_announcement', id=ann.id) }}" 
+                       class="btn btn-sm btn-warning">编辑</a>
+    
+    <!-- 删除表单 -->
+                    <form class="d-inline" 
+                          action="{{ url_for('main.delete_announcement', id=ann.id) }}" 
+                          method="POST">
+                        <button type="submit" 
+                                class="btn btn-sm btn-danger" 
+                                onclick="return confirm('此操作不可逆，确定删除？')">
+                            删除
+                        </button>
+                    </form>
+                </td>
+            {% endfor %}    
+    <!-- 分页 -->
+    <nav>
+        <ul class="pagination">
+            {% for page_num in announcements.iter_pages() %}
+            <li class="page-item {% if page_num == announcements.page %}active{% endif %}">
+                <a class="page-link" 
+                   href="{{ url_for('main.manage_announcements', page=page_num) }}">
+                    {{ page_num }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}
+
