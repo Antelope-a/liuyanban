@@ -38,3 +38,14 @@ class AnnouncementForm(FlaskForm):
     submit = SubmitField('发布公告')
     # 添加编辑模式标识（可选）
     is_edit = HiddenField('是否为编辑模式', default=False)
+
+class QuestionForm(FlaskForm):
+    content = TextAreaField('问题内容', validators=[
+        DataRequired(),
+        Length(max=200, message="问题不能超过200字")
+    ])
+    answer = StringField('正确答案', validators=[
+        DataRequired(),
+        Length(max=100, message="答案不能超过100字")
+    ])
+    submit = SubmitField('提交')

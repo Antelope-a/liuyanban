@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-4">
+        <a href="{{ url_for('main.admin_dashboard') }}"
+           class="btn btn-secondary">                                                               <i class="bi bi-arrow-left"></i> 返回管理面板
+        </a>
+    </div>
+    <h2>问题管理
+        <a href="{{ url_for('main.add_question') }}" class="btn btn-success btn-sm float-end">
+            + 新问题
+        </a>
+    </h2>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>问题内容</th>
+                <th>正确答案</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for q in questions %}
+            <tr>
+                <td>{{ q.content }}</td>
+                <td>{{ q.answer }}</td>
+                <td>
+                    {% if q.is_active %}
+                        <span class="badge bg-success">启用</span>
+                    {% else %}
+                        <span class="badge bg-secondary">禁用</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('main.edit_question', id=q.id) }}" class="btn btn-sm btn-warning">编辑</a>
+                    <form method="POST" action="{{ url_for('main.toggle_question', id=q.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-info">
+                            {{ '禁用' if q.is_active else '启用' }}
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('main.delete_question', id=q.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-danger" 
+                            onclick="return confirm('确定删除此问题？')">删除</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">暂无问题</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

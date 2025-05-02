@@ -29,4 +29,10 @@ class Announcement(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     admin_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # 修正后的外键
     admin = db.relationship('User', backref='announcements')
-
+class Question(db.Model):
+    __tablename__ = 'question'
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String(200), nullable=False, unique=True)
+    answer = db.Column(db.String(100), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)  # 是否启用该问题
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
