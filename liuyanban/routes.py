@@ -149,6 +149,7 @@ def check_question_answered(f):
 @check_question_answered
 def index():
     form = MessageForm()
+    search_keyword = request.args.get('q', '')  # 获取搜索参数
     page = request.args.get('page', 1, type=int)  # 新增分页参数
     per_page = 10  # 每页显示数量
     # POST 请求处理（提交留言）
@@ -178,11 +179,22 @@ def index():
         
         db.session.commit()
         return redirect(url_for('main.index'))  # 重定向到 GET 请求
-    
-    # GET 请求处理（显示页面）
-    messages = Message.query.order_by(
-        Message.timestamp.desc()
-    ).paginate(page=page, per_page=per_page)  # 修改为分页查询
+    # 构建查询（同时处理搜索和普通列表）
+    query = Message.query.options(joinedload(Message.images))
+    if search_keyword:
+        search_pattern = f"%{search_keyword}%"
+        query = query.filter(
+            or_(
+                Message.content.ilike(search_pattern),
+                Message.username.ilike(search_pattern)
+            )
+        )
+
+    messages = query.order_by(Message.timestamp.desc()).paginate(
+        page=page, 
+        per_page=per_page,
+        error_out=False
+    )
 
     announcements = Announcement.query.order_by(
         Announcement.timestamp.desc()
@@ -192,7 +204,8 @@ def index():
         'index.html',
         form=form,
         messages=messages,
-        announcements=announcements  # 确保传递公告数据
+        announcements=announcements,
+        search_keyword=search_keyword
     )
 
 @main_bp.route('/uploads/<filename>')
@@ -217,24 +230,6 @@ def reply_message(parent_id):
         return redirect(url_for('main.index'))
     
     return render_template('reply.html', form=form, parent=parent_message)
-#搜索
-@main_bp.route('/search', methods=['GET', 'POST'])
-@check_question_answered
-def search():
-    form = SearchForm()
-    results = []
-    if form.validate_on_submit():
-        keyword = form.keyword.data
-        search_pattern = f"%{keyword}%"
-        # 关键修改：预加载关联图片
-        results = Message.query.options(joinedload(Message.images)).filter(
-            or_(
-                Message.content.like(search_pattern),
-                Message.username.like(search_pattern)
-            )
-        ).order_by(Message.timestamp.desc()).all()
-    
-    return render_template('search.html', form=form, results=results)
 
 @main_bp.route('/admin/post_announcement', methods=['GET', 'POST'])
 @admin_required

@@ -1,5 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
+<!-- 搜索框 -->
+<div class="search-section mb-4">
+    <form action="{{ url_for('main.index') }}" method="GET">
+        <div class="input-group">
+            <input type="text" 
+                   name="q" 
+                   class="form-control" 
+                   placeholder="搜索留言内容或昵称..."
+                   value="{{ search_keyword }}">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> 搜索
+            </button>
+        </div>
+    </form>
+    {% if search_keyword %}
+    <div class="mt-2">
+        <small>搜索关键词: "{{ search_keyword }}" 
+            <a href="{{ url_for('main.index') }}" class="text-muted">
+                (清除搜索)
+            </a>
+        </small>
+    </div>
+    {% endif %}
+</div>
     <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="mb-3">
@@ -17,12 +41,6 @@
         </div>
         {{ form.submit(class="btn btn-primary") }}
     </form>
-<!-- 添加搜索按钮 -->
-    <div class="mt-4 mb-4">
-        <a href="{{ url_for('main.search') }}" class="btn btn-primary">
-            <i class="bi bi-search"></i> 进入搜索页
-        </a>
-    </div>
     <!-- 在留言表单上方添加 -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
@@ -85,7 +103,7 @@
         <!-- 上一页 -->
         {% if messages.has_prev %}
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('main.index', page=messages.prev_num) }}">
+                <a class="page-link" href="{{ url_for('main.index', page=messages.prev_num, q=search_keyword) }}">
                     &laquo; 上一页
                 </a>
             </li>
@@ -99,7 +117,7 @@
         {% for page_num in messages.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=3) %}
             {% if page_num %}
                 <li class="page-item {% if page_num == messages.page %}active{% endif %}">
-                    <a class="page-link" href="{{ url_for('main.index', page=page_num) }}">
+                    <a class="page-link" href="{{ url_for('main.index', page=page_num, q=search_keyword) }}">
                         {{ page_num }}
                     </a>
                 </li>
@@ -113,7 +131,7 @@
         <!-- 下一页 -->
         {% if messages.has_next %}
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('main.index', page=messages.next_num) }}">
+                <a class="page-link" href="{{ url_for('main.index', page=messages.next_num, q=search_keyword) }}">
                     下一页 &raquo;
                 </a>
             </li>
