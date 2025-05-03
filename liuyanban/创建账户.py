@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash
 app = create_app()
 with app.app_context():
     admin = User(
-        username="admin",
+        username="admin",#替换为实际用户名
         password=generate_password_hash("admin123"),  # 替换为实际密码
         is_admin=True
     )
