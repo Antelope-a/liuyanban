@@ -6,8 +6,8 @@ from werkzeug.security import generate_password_hash
 app = create_app()
 with app.app_context():
     admin = User(
-        username="Antelope",
-        password=generate_password_hash("Makise1048596"),  # 替换为实际密码
+        username="admin",
+        password=generate_password_hash("admin123"),  # 替换为实际密码
         is_admin=True
     )
     db.session.add(admin)
